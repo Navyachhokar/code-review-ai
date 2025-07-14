@@ -1,66 +1,65 @@
-import { useState, useEffect } from 'react'
-import "prismjs/themes/prism-tomorrow.css"
-import Editor from "react-simple-code-editor"
-import prism from "prismjs"
-import Markdown from "react-markdown"
-import rehypeHighlight from "rehype-highlight";
-import "highlight.js/styles/github-dark.css";
-import axios from 'axios'
-import './App.css'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Home from './pages/Home';
+import CodeReview from './pages/CodeReview';
+import './Navbar.css';
+import SignIn from './pages/SignIn';
+import SignUp from './pages/SignUp';
 
 function App() {
-  const [ count, setCount ] = useState(0)
-  const [ code, setCode ] = useState(` function sum() {
-  return 1 + 1
-}`)
+  const HomeNavbar = () => (
+    <nav className="navbar">
+      <div className="navbar-logo">
+        <img src="/logo.png" alt="Logo" style={{ height: '30px', marginRight: '10px' }} />
+        CodeReviewAI
+      </div>
+      <ul className="navbar-links">
+        <li><a href="/review">Review</a></li>
+        <li><a href="/signin">Sign In</a></li>
+        <li><a href="/signup">Sign Up</a></li>
+      </ul>
+    </nav>
+  );
 
-  const [ review, setReview ] = useState(``)
-
-  useEffect(() => {
-    prism.highlightAll()
-  }, [])
-
-  async function reviewCode() {
-    const response = await axios.post('http://localhost:3000/ai/get-review', { code })
-    setReview(response.data)
-  }
+  const ReviewNavbar = () => (
+    <nav className="navbar" style={{ position: 'absolute', top: 0, width: '100%', zIndex: 1000 }}>
+      <div className="navbar-logo">
+        <img src="/logo.png" alt="Logo" style={{ height: '30px', marginRight: '10px' }} />
+        CodeReviewAI
+      </div>
+      <div className="navbar-links">
+        <a href="/" className="nav-button">Home</a>
+      </div>
+    </nav>
+  );
 
   return (
-    <>
-      <main>
-        <div className="left">
-          <div className="code">
-            <Editor
-              value={code}
-              onValueChange={code => setCode(code)}
-              highlight={code => prism.highlight(code, prism.languages.javascript, "javascript")}
-              padding={10}
-              style={{
-                fontFamily: '"Fira code", "Fira Mono", monospace',
-                fontSize: 16,
-                border: "1px solid #ddd",
-                borderRadius: "5px",
-                height: "100%",
-                width: "100%"
-              }}
-            />
-          </div>
-          <div
-            onClick={reviewCode}
-            className="review">Review</div>
-        </div>
-        <div className="right">
-          <Markdown
-
-            rehypePlugins={[ rehypeHighlight ]}
-
-          >{review}</Markdown>
-        </div>
-      </main>
-    </>
-  )
+    <Router>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <div>
+              <HomeNavbar />
+              <Home />
+            </div>
+          }
+        />
+        <Route
+          path="/review"
+          element={
+            <div style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
+              <ReviewNavbar />
+              <div style={{ flex: 1, marginTop: '3.5rem', overflow: 'hidden' }}>
+                <CodeReview />
+              </div>
+            </div>
+          }
+        />
+        <Route path="/signin" element={<SignIn />} />
+        <Route path="/signup" element={<SignUp />} />
+      </Routes>
+    </Router>
+  );
 }
 
-
-
-export default App
+export default App;
